@@ -74,8 +74,6 @@ git clone https://github.com/TU_USUARIO/4_abril_Pandas_Bases_de_datos.git
 cd 4_abril_Pandas_Bases_de_datos
 ```
 
-
-
 ### Ejemplos de Análisis
 - Distribución de reseñas por listing:
 Utiliza consultas SQL para obtener el número de reseñas por propiedad y crea histogramas para visualizar la distribución.
@@ -85,6 +83,19 @@ Calcula la disponibilidad promedio por tipo de habitación y analiza la relació
 Une información de las tablas listings y reviews para explorar cómo influyen factores como la ubicación, tipo de propiedad y número de reseñas en los ingresos diarios.
 - Análisis temporal:
 Trabaja con series temporales (por ejemplo, reviews a lo largo del año) para identificar tendencias y patrones estacionales.
+
+### Hospedaje de la Base de Datos con Aiven
+
+En este taller, la base de datos se hospeda utilizando [Aiven](https://aiven.io/), lo que nos permite disponer de una infraestructura escalable y gestionada para almacenar y consultar nuestros datos de Airbnb. Aiven ofrece servicios de bases de datos en la nube, facilitando la conexión con herramientas de análisis como Pandas y SQLAlchemy.
+
+Para conectar con la base de datos alojada en Aiven, se utiliza la siguiente cadena de conexión (connection string):
+
+```python
+from sqlalchemy import create_engine
+
+# Ejemplo de cadena de conexión para MySQL alojado en Aiven
+engine = create_engine("mysql+pymysql://usuario:contraseña@host:puerto/nombre_de_base")
+```
 
 ### Contribuciones
 
