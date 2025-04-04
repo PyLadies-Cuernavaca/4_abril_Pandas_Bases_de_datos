@@ -1,0 +1,5 @@
+.DS_Store
+.ipynb_checkpoints/
+.env
+*.pem
+examples/airbnb/data_airbnb_cdmx_2024

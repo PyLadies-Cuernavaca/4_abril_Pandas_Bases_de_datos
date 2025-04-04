@@ -1,0 +1,232 @@
+---
+title: "Bases de datos y Pandas:"
+subtitle: "El dúo dinámico, para el análisis eficiente"
+author: "Chica Dev"
+date: "April 4, 2025"
+format:
+  revealjs:
+    slide-number: true
+    show-slide-number: print
+    theme: serif
+    chalkboard:
+      buttons: true
+    preview-links: auto
+    logo: https://pyladies.com/assets/images/pylady_geek.png
+    footer: <https://pyladies.com/>
+---
+
+## Objetivos del taller
+- Integrar bases de datos relacionales con Pandas para el análisis eficiente de datos.
+- Aprender a extraer, transformar y exportar datos desde SQL usando Pandas.
+- Realizar ejercicios prácticos aplicados a casos reales con un dataset de Airbnb.
+
+---
+
+## Flujo de Trabajo
+
+1. **Conexión a Bases de Datos:**  
+   Conexión a SQLite y MySQL, consulta de datos.
+
+2. **Extracción y Limpieza:**  
+   Uso de `pd.read_sql` y `pd.read_sql_query`, conversión de tipos, manejo de nulos.
+
+3. **Integración y Análisis:**  
+   Uniones de tablas (listings, reviews, calendars), análisis descriptivo y segmentación.
+
+4. **Exportación de Resultados:**  
+   Guardar resultados en CSV/Excel para reportes.
+
+## Introducción a SQL
+
+**¿Qué es SQL?**
+
+Lenguaje para consultar y manipular bases de datos relacionales.
+
+- SELECT, WHERE, GROUP BY, JOIN, ORDER BY
+
+**Características clave**
+
+- Eficiente para manejar grandes volúmenes de datos.
+- Lenguaje declarativo (describes qué quieres, no cómo).
+- Amplia compatibilidad con herramientas de análisis y BI.
+
+---
+
+## Entendiendo los comandos SQL
+
+SQL (Structured Query Language) es un lenguaje utilizado para comunicarse con bases de datos. Los comandos SQL se agrupan en 4 grandes categorías:
+
+- 🧱 **DDL** – Data Definition Language  
+  *Crear y modificar estructuras de base de datos.*  
+  `CREATE`, `ALTER`, `DROP`, `TRUNCATE`
+
+- 🔍 **DQL** – Data Query Language  
+  *Consultar datos de las tablas.*  
+  `SELECT`
+
+---
+
+- ✏️ **DML** – Data Manipulation Language  
+  *Manipular registros existentes.*  
+  `INSERT`, `UPDATE`, `DELETE`
+
+- 🔐 **DCL** – Data Control Language  
+  *Gestionar permisos y seguridad.*  
+  `GRANT`, `REVOKE`
+
+---
+
+![](images/sql_command_categories.webp){fig-alt="Clasificación de comandos SQL"}
+
+---
+
+## Ejemplos básicos
+
+**DDL – Crear tabla**
+```sql
+CREATE TABLE customers (
+    id INT PRIMARY KEY,
+    first_name VARCHAR(20),
+    last_name VARCHAR(50),
+    email VARCHAR(50)
+);
+```
+
+**DML – Insertar datos**
+```sql
+INSERT INTO customers (id, first_name, last_name, email)
+VALUES (1, 'Bennison', 'J', 'ben@gmail.com');
+```
+
+---
+
+**DQL – Consultar datos**
+```sql
+SELECT * FROM customers;
+SELECT first_name FROM customers WHERE id = 1;
+```
+
+**DML – Actualizar datos**
+```sql
+UPDATE customers SET first_name = 'Ben' WHERE id = 1;
+```
+
+**DML – Eliminar datos**
+```sql
+DELETE FROM customers WHERE id = 1;
+```
+
+---
+
+## Conexión y Extracción de Datos
+
+### Conexión a SQLite y MySQL
+
+```python
+import sqlite3
+import pandas as pd
+from sqlalchemy import create_engine
+
+# Ejemplo con SQLite
+conn = sqlite3.connect("airbnb_taller.db")
+df_listings = pd.read_sql("SELECT * FROM listings2", conn)
+
+# Ejemplo con MySQL
+engine = create_engine("mysql+pymysql://user:password@localhost/airbnb")
+df_listings_mysql = pd.read_sql("SELECT * FROM listings", engine)
+```
+
+---
+
+## Explorando datos de Airbnb
+
+* Propiedades por tipo de habitación
+```python
+df = pd.read_sql("""
+SELECT room_type, COUNT(*) as total
+FROM listings2
+GROUP BY room_type
+""", conn)
+```
+
+* Precio promedio por colonia
+```python
+df = pd.read_sql("""
+SELECT neighbourhood, AVG(price) as avg_price
+FROM listings2
+GROUP BY neighbourhood
+""", conn)
+```
+
+---
+
+## Combinando `listings` y `reviews`
+
+```python
+query = """
+SELECT l.id, l.price, r.date
+FROM listings2 l
+JOIN reviews r ON l.id = r.listing_id
+"""
+df = pd.read_sql(query, conn)
+```
+
+---
+
+## Exportación de resultados
+
+```python
+df.to_csv("resultados_airbnb.csv", index=False)
+df.to_excel("resumen_airbnb.xlsx", index=False)
+```
+
+---
+
+## ¿Dónde encontrar datasets públicos? 🌐
+
+Aquí algunas fuentes útiles para practicar SQL y análisis de datos:
+
+- 🕵️ **SQL Murder Mystery**  
+  <https://www.kaggle.com/code/johnp47/sql-murder-mystery-my-walkthrough>  
+  Base de datos para resolver un crimen utilizando SQL.
+  - Archivo: `sql-murder-mystery.db`  
+  - SQLite  
+  - Tablas: `crime_scene_report`, `drivers_license`, `person`, `interview`, `facebook_event_checkin`, etc.
+
+- 🏘️ **Airbnb data**  
+  <https://insideairbnb.com/get-the-data/>  
+  Datos reales sobre alojamientos, precios y disponibilidad por ciudad.
+
+- 📦 **Kaggle datasets con SQL**  
+  <https://www.kaggle.com/datasets?tags=16641-SQL>  
+  Cientos de datasets preparados para trabajar consultas SQL.
+
+- 🧵 **Lista extensa de datasets públicos**  
+  <https://www.reddit.com/r/SQL/comments/9o3o0o/list_of_awesome_public_datasets/>
+
+---
+
+## Ejercicio práctico 💻
+
+**Contexto:**  
+Tienes acceso a una base de datos MySQL con tres tablas: `calendars`, `listings`,  y `reviews`.
+
+**Reto:**  
+
+- Identifica las colonias con propiedades más caras.
+- Cuenta el número de reseñas por propiedad.
+- Calcula la disponibilidad promedio por tipo de habitación.
+- Exporta tus resultados a Excel.
+
+---
+
+## Dudas, ideas o comentarios
+
+![](https://media1.tenor.com/m/u5uXD3icJ1kAAAAC/simpsons-homer-simpson.gif){fig-alt="Homero Simpson escondiéndose en césped"}
+
+---
+
+## Nos seguimos escribiendo por redes sociales 💻✨
+
+Contacto  
+<https://www.linkedin.com/in/chicadev/>
